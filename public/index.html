@@ -42,7 +42,6 @@
       background: var(--bg);
       color: var(--text-primary);
       min-height: 100vh;
-      padding: 0;
     }
 
     .header {
@@ -53,7 +52,6 @@
       top: 0;
       z-index: 10;
     }
-
     .header-inner {
       max-width: 640px;
       margin: 0 auto;
@@ -61,43 +59,39 @@
       align-items: center;
       justify-content: space-between;
     }
-
     .logo { font-size: 16px; font-weight: 600; letter-spacing: -0.02em; }
     .logo span { color: var(--text-secondary); font-weight: 400; }
-
-    .main {
-      max-width: 640px;
-      margin: 0 auto;
-      padding: 24px 16px 48px;
+    .version-badge {
+      font-size: 10px; padding: 2px 8px;
+      border-radius: 20px; background: var(--border);
+      color: var(--text-hint); font-weight: 500;
     }
+
+    .main { max-width: 640px; margin: 0 auto; padding: 24px 16px 48px; }
 
     .section-label {
-      font-size: 11px;
-      font-weight: 500;
-      color: var(--text-hint);
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
+      font-size: 11px; font-weight: 500; color: var(--text-hint);
+      text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px;
+    }
+    .section-row {
+      display: flex; align-items: center; justify-content: space-between;
       margin-bottom: 8px;
     }
+    .section-row .section-label { margin-bottom: 0; }
+    .tag { font-size: 10px; padding: 2px 7px; border-radius: 10px; font-weight: 500; }
+    .tag-canvas { background: #EAF3DE; color: #3B6D11; }
+    .tag-ai     { background: #E6F1FB; color: #185FA5; }
 
     .card {
-      background: var(--surface);
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 16px;
-      margin-bottom: 16px;
+      background: var(--surface); border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg); padding: 16px; margin-bottom: 16px;
     }
 
     /* 업로드 존 */
     .upload-zone {
-      border: 1.5px dashed var(--border-strong);
-      border-radius: var(--radius-lg);
-      padding: 40px 20px;
-      text-align: center;
-      cursor: pointer;
-      transition: background 0.2s;
-      margin-bottom: 16px;
-      background: var(--surface);
+      border: 1.5px dashed var(--border-strong); border-radius: var(--radius-lg);
+      padding: 40px 20px; text-align: center; cursor: pointer;
+      transition: background 0.2s; margin-bottom: 16px; background: var(--surface);
     }
     .upload-zone:hover { background: var(--bg); }
     .upload-zone.has-image { padding: 0; border-style: solid; overflow: hidden; }
@@ -109,153 +103,89 @@
 
     /* 슬라이더 그리드 */
     .controls-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 16px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px;
     }
-
-    @media (max-width: 400px) {
-      .controls-grid { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 400px) { .controls-grid { grid-template-columns: 1fr; } }
 
     .control-card {
-      background: var(--surface);
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 12px 14px;
+      background: var(--surface); border: 0.5px solid var(--border);
+      border-radius: var(--radius-md); padding: 12px 14px;
     }
-
     .control-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;
     }
-
     .control-name { font-size: 13px; font-weight: 500; }
-    .control-val { font-size: 13px; color: var(--text-secondary); min-width: 28px; text-align: right; }
+    .control-val  { font-size: 13px; color: var(--text-secondary); min-width: 28px; text-align: right; }
 
     input[type=range] {
-      width: 100%;
-      -webkit-appearance: none;
-      height: 4px;
-      background: var(--border);
-      border-radius: 2px;
-      outline: none;
+      width: 100%; -webkit-appearance: none; height: 4px;
+      background: var(--border); border-radius: 2px; outline: none;
     }
     input[type=range]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 18px; height: 18px;
-      border-radius: 50%;
-      background: var(--text-primary);
-      cursor: pointer;
+      -webkit-appearance: none; width: 18px; height: 18px;
+      border-radius: 50%; background: var(--text-primary); cursor: pointer;
     }
 
     /* 프리셋 */
     .preset-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
     .preset-btn {
-      font-size: 12px; padding: 6px 14px;
-      border: 0.5px solid var(--border-strong);
-      border-radius: 20px;
-      background: transparent;
-      cursor: pointer;
-      color: var(--text-secondary);
-      transition: all 0.15s;
+      font-size: 12px; padding: 6px 14px; border: 0.5px solid var(--border-strong);
+      border-radius: 20px; background: transparent; cursor: pointer;
+      color: var(--text-secondary); transition: all 0.15s;
     }
     .preset-btn:hover, .preset-btn.active {
-      background: var(--text-primary);
-      color: var(--accent-fg);
-      border-color: var(--text-primary);
+      background: var(--text-primary); color: var(--accent-fg); border-color: var(--text-primary);
     }
 
     /* fidelity */
     .fidelity-desc {
-      font-size: 11px;
-      color: var(--text-hint);
-      display: flex;
-      justify-content: space-between;
-      margin-top: 4px;
+      font-size: 11px; color: var(--text-hint);
+      display: flex; justify-content: space-between; margin-top: 4px;
     }
 
     /* 실행 버튼 */
     .run-btn {
-      width: 100%;
-      padding: 14px;
-      background: var(--accent);
-      color: var(--accent-fg);
-      border: none;
-      border-radius: var(--radius-md);
-      font-size: 15px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: opacity 0.15s;
-      margin-bottom: 16px;
+      width: 100%; padding: 14px; background: var(--accent); color: var(--accent-fg);
+      border: none; border-radius: var(--radius-md); font-size: 15px; font-weight: 500;
+      cursor: pointer; transition: opacity 0.15s; margin-bottom: 16px;
     }
     .run-btn:hover { opacity: 0.85; }
     .run-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    /* 상태 표시 */
-    .status-bar {
-      display: flex; align-items: center; gap: 8px;
-      font-size: 12px; color: var(--text-secondary);
-      padding: 8px 12px;
-      background: var(--bg);
-      border-radius: var(--radius-md);
-      margin-bottom: 16px;
-    }
-    .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--border-strong); flex-shrink: 0; }
-    .dot.ok { background: var(--success); }
-    .dot.err { background: var(--error); }
-
     /* 결과 */
     .result-panel { display: none; }
     .result-panel.visible { display: block; }
-    .result-header {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 12px;
-    }
-    .badge {
-      font-size: 11px; padding: 3px 10px;
-      border-radius: 20px; font-weight: 500;
-    }
+    .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
     .badge-info { background: #E6F1FB; color: #185FA5; }
     .badge-ok   { background: #EAF3DE; color: #3B6D11; }
     .badge-err  { background: #FCEBEB; color: #A32D2D; }
 
+    /* 3단 비교 */
     .compare-grid {
-      display: grid; grid-template-columns: 1fr 1fr;
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
       gap: 1px; background: var(--border);
-      border-radius: var(--radius-md); overflow: hidden;
-      margin-bottom: 12px;
+      border-radius: var(--radius-md); overflow: hidden; margin-bottom: 12px;
     }
     .compare-pane { background: var(--surface); padding: 8px; text-align: center; }
-    .compare-pane img { width: 100%; border-radius: 4px; max-height: 220px; object-fit: cover; }
-    .compare-label { font-size: 11px; color: var(--text-hint); margin-top: 4px; }
+    .compare-pane img { width: 100%; border-radius: 4px; max-height: 180px; object-fit: cover; }
+    .compare-label { font-size: 10px; color: var(--text-hint); margin-top: 4px; }
 
     .spinner {
-      width: 24px; height: 24px;
-      border: 2px solid var(--border);
-      border-top-color: var(--text-secondary);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto 10px;
+      width: 24px; height: 24px; border: 2px solid var(--border);
+      border-top-color: var(--text-secondary); border-radius: 50%;
+      animation: spin 0.8s linear infinite; margin: 0 auto 10px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-
     .loading-wrap { text-align: center; padding: 2rem; }
-    .loading-msg { font-size: 13px; color: var(--text-secondary); }
+    .loading-msg  { font-size: 13px; color: var(--text-secondary); }
 
     .download-link {
-      display: block; text-align: center;
-      padding: 10px;
-      border: 0.5px solid var(--border-strong);
-      border-radius: var(--radius-md);
-      font-size: 13px; color: var(--text-secondary);
-      text-decoration: none;
+      display: block; text-align: center; padding: 10px;
+      border: 0.5px solid var(--border-strong); border-radius: var(--radius-md);
+      font-size: 13px; color: var(--text-secondary); text-decoration: none; margin-bottom: 8px;
     }
     .download-link:hover { background: var(--bg); }
-
     .err-msg { font-size: 13px; color: var(--error); line-height: 1.7; white-space: pre-line; }
   </style>
 </head>
@@ -264,6 +194,7 @@
 <header class="header">
   <div class="header-inner">
     <p class="logo">Face Retouch <span>· CodeFormer</span></p>
+    <span class="version-badge">v1.2</span>
   </div>
 </header>
 
@@ -278,24 +209,59 @@
   </div>
   <input type="file" id="fileInput" accept="image/*" style="display:none">
 
-  <!-- 보정 강도 -->
-  <p class="section-label">보정 강도</p>
+  <!-- 얼굴형 보정 (Canvas 워핑) -->
+  <div class="section-row">
+    <p class="section-label">얼굴형 보정</p>
+    <span class="tag tag-canvas">Canvas · 즉시 처리</span>
+  </div>
   <div class="controls-grid">
     <div class="control-card">
-      <div class="control-header"><span class="control-name">피부 보정</span><span class="control-val" id="skinVal">50</span></div>
-      <input type="range" min="0" max="100" value="50" step="1" oninput="document.getElementById('skinVal').textContent=this.value">
+      <div class="control-header"><span class="control-name">턱선 슬리밍</span><span class="control-val" id="jawVal">0</span></div>
+      <input type="range" min="0" max="60" value="0" step="1" id="jawSlider"
+             oninput="document.getElementById('jawVal').textContent=this.value">
     </div>
     <div class="control-card">
-      <div class="control-header"><span class="control-name">밝기·선명도</span><span class="control-val" id="brightVal">40</span></div>
-      <input type="range" min="0" max="100" value="40" step="1" oninput="document.getElementById('brightVal').textContent=this.value">
+      <div class="control-header"><span class="control-name">얼굴 축소</span><span class="control-val" id="faceVal">0</span></div>
+      <input type="range" min="0" max="40" value="0" step="1" id="faceSlider"
+             oninput="document.getElementById('faceVal').textContent=this.value">
     </div>
     <div class="control-card">
-      <div class="control-header"><span class="control-name">얼굴형 슬리밍</span><span class="control-val" id="slimVal">30</span></div>
-      <input type="range" min="0" max="100" value="30" step="1" oninput="document.getElementById('slimVal').textContent=this.value">
+      <div class="control-header"><span class="control-name">눈 확대</span><span class="control-val" id="eyeEnlargeVal">0</span></div>
+      <input type="range" min="0" max="40" value="0" step="1" id="eyeEnlargeSlider"
+             oninput="document.getElementById('eyeEnlargeVal').textContent=this.value">
     </div>
     <div class="control-card">
-      <div class="control-header"><span class="control-name">눈 보정</span><span class="control-val" id="eyeVal">20</span></div>
-      <input type="range" min="0" max="100" value="20" step="1" oninput="document.getElementById('eyeVal').textContent=this.value">
+      <div class="control-header"><span class="control-name">코 축소</span><span class="control-val" id="noseVal">0</span></div>
+      <input type="range" min="0" max="40" value="0" step="1" id="noseSlider"
+             oninput="document.getElementById('noseVal').textContent=this.value">
+    </div>
+  </div>
+
+  <!-- 피부·색감 보정 (Canvas 필터) -->
+  <div class="section-row">
+    <p class="section-label">피부 · 색감</p>
+    <span class="tag tag-canvas">Canvas · 즉시 처리</span>
+  </div>
+  <div class="controls-grid">
+    <div class="control-card">
+      <div class="control-header"><span class="control-name">피부 스무딩</span><span class="control-val" id="skinVal">0</span></div>
+      <input type="range" min="0" max="100" value="0" step="1" id="skinSlider"
+             oninput="document.getElementById('skinVal').textContent=this.value">
+    </div>
+    <div class="control-card">
+      <div class="control-header"><span class="control-name">밝기</span><span class="control-val" id="brightVal">0</span></div>
+      <input type="range" min="-50" max="80" value="0" step="1" id="brightSlider"
+             oninput="document.getElementById('brightVal').textContent=this.value">
+    </div>
+    <div class="control-card">
+      <div class="control-header"><span class="control-name">선명도</span><span class="control-val" id="sharpVal">0</span></div>
+      <input type="range" min="0" max="100" value="0" step="1" id="sharpSlider"
+             oninput="document.getElementById('sharpVal').textContent=this.value">
+    </div>
+    <div class="control-card">
+      <div class="control-header"><span class="control-name">채도</span><span class="control-val" id="satVal">0</span></div>
+      <input type="range" min="-50" max="80" value="0" step="1" id="satSlider"
+             oninput="document.getElementById('satVal').textContent=this.value">
     </div>
   </div>
 
@@ -306,17 +272,22 @@
     <button class="preset-btn" onclick="applyPreset('portrait',this)">인물 사진</button>
     <button class="preset-btn" onclick="applyPreset('soft',this)">소프트</button>
     <button class="preset-btn" onclick="applyPreset('strong',this)">강한 보정</button>
+    <button class="preset-btn" onclick="applyPreset('reset',this)">초기화</button>
   </div>
 
-  <!-- CodeFormer fidelity -->
-  <p class="section-label">CodeFormer 충실도</p>
+  <!-- CodeFormer AI -->
+  <div class="section-row">
+    <p class="section-label">CodeFormer AI 복원</p>
+    <span class="tag tag-ai">Replicate AI</span>
+  </div>
   <div class="card">
     <div class="control-header">
       <span class="control-name">fidelity</span>
       <span class="control-val" id="fidelityVal">0.7</span>
     </div>
-    <input type="range" min="0" max="1" value="0.7" step="0.1" oninput="document.getElementById('fidelityVal').textContent=parseFloat(this.value).toFixed(1)" id="fidelitySlider">
-    <div class="fidelity-desc"><span>강한 보정 (0.0)</span><span>원본 유지 (1.0)</span></div>
+    <input type="range" min="0" max="1" value="0.7" step="0.1" id="fidelitySlider"
+           oninput="document.getElementById('fidelityVal').textContent=parseFloat(this.value).toFixed(1)">
+    <div class="fidelity-desc"><span>강한 AI 보정 (0.0)</span><span>원본 유지 (1.0)</span></div>
   </div>
 
   <!-- 실행 -->
@@ -336,75 +307,91 @@
 <script>
   /**
    * Description: Face Retouch 프론트엔드
-   * 작성자: YeonJu / Version : 1.1
+   * 작성자: YeonJu / Version : 1.2
    *
-   * v1.1 변경사항:
-   *   - resizeImage() 추가: 업로드 시 1024px / JPEG 85%로 압축
-   *   - HTTP 413 (요청 본문 초과) 오류 방지
+   * v1.2 변경사항:
+   *   - Canvas liquidWarp 엔진 추가
+   *     → 턱선 슬리밍, 얼굴 축소, 눈 확대, 코 축소
+   *   - Canvas 픽셀 필터 추가
+   *     → 피부 스무딩, 밝기, 선명도(언샤프마스크), 채도
+   *   - 보정 파이프라인: 원본 → Canvas 워핑/필터 → Replicate AI
+   *   - 결과 3단 비교: ①원본 / ②Canvas 보정 / ③AI 최종
+   *   - 프리셋 초기화 버튼 추가
+   *   - resizeImage() 유지 (HTTP 413 방지)
    */
 
-  // ⚠️ Vercel 배포 후 아래 URL을 본인 도메인으로 변경하세요
   const PROXY_URL = '/api/retouch';
 
+  // ─────────────────────────────────────
+  // 프리셋
+  // ─────────────────────────────────────
   const presets = {
-    natural: { skin:40, bright:30, slim:20, eye:15, fidelity:0.8 },
-    portrait:{ skin:60, bright:50, slim:35, eye:40, fidelity:0.7 },
-    soft:    { skin:70, bright:20, slim:10, eye:10, fidelity:0.6 },
-    strong:  { skin:80, bright:70, slim:60, eye:65, fidelity:0.3 }
+    natural: { jaw:15, face:8,  eye:10, nose:5,  skin:30, bright:15, sharp:20, sat:10,  fidelity:0.8 },
+    portrait:{ jaw:25, face:15, eye:20, nose:10, skin:50, bright:25, sharp:40, sat:20,  fidelity:0.7 },
+    soft:    { jaw:10, face:5,  eye:8,  nose:5,  skin:70, bright:10, sharp:10, sat:-10, fidelity:0.6 },
+    strong:  { jaw:50, face:35, eye:35, nose:30, skin:80, bright:40, sharp:60, sat:40,  fidelity:0.3 },
+    reset:   { jaw:0,  face:0,  eye:0,  nose:0,  skin:0,  bright:0,  sharp:0,  sat:0,   fidelity:0.7 }
   };
 
   function applyPreset(name, btn) {
     document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+    if (name !== 'reset') btn.classList.add('active');
     const p = presets[name];
-    setV('skinVal', p.skin);
-    setV('brightVal', p.bright);
-    setV('slimVal', p.slim);
-    setV('eyeVal', p.eye);
-    document.getElementById('fidelitySlider').value = p.fidelity;
-    document.getElementById('fidelityVal').textContent = p.fidelity.toFixed(1);
+    setSlider('jawSlider',        'jawVal',         p.jaw);
+    setSlider('faceSlider',       'faceVal',        p.face);
+    setSlider('eyeEnlargeSlider', 'eyeEnlargeVal',  p.eye);
+    setSlider('noseSlider',       'noseVal',        p.nose);
+    setSlider('skinSlider',       'skinVal',        p.skin);
+    setSlider('brightSlider',     'brightVal',      p.bright);
+    setSlider('sharpSlider',      'sharpVal',       p.sharp);
+    setSlider('satSlider',        'satVal',         p.sat);
+    setSlider('fidelitySlider',   'fidelityVal',    p.fidelity, true);
   }
 
-  function setV(id, val) { document.getElementById(id).textContent = val; }
+  function setSlider(sliderId, valId, val, isFloat = false) {
+    const slider = document.getElementById(sliderId);
+    const valEl  = document.getElementById(valId);
+    if (slider) slider.value = val;
+    if (valEl)  valEl.textContent = isFloat ? parseFloat(val).toFixed(1) : val;
+  }
 
-  // ─────────────────────────────────────────
-  // [v1.1 추가] 이미지 리사이즈 → base64 변환
-  // maxWidth: 1024px, 품질: JPEG 85%
-  // HTTP 413 방지용
-  // ─────────────────────────────────────────
+  // ─────────────────────────────────────
+  // 이미지 로드 + 리사이즈 (HTTP 413 방지)
+  // ─────────────────────────────────────
+  let originalImage  = null;
+  let originalBase64 = null;
+
+  function triggerUpload() { document.getElementById('fileInput').click(); }
+
   function resizeImage(file, maxWidth = 1024) {
     return new Promise((resolve) => {
       const img = new Image();
       const url = URL.createObjectURL(file);
       img.onload = () => {
         const scale = Math.min(1, maxWidth / img.width);
-        const canvas = document.createElement('canvas');
-        canvas.width  = img.width  * scale;
-        canvas.height = img.height * scale;
-        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-        URL.revokeObjectURL(url); // 메모리 해제
-        resolve(canvas.toDataURL('image/jpeg', 0.85));
+        const c = document.createElement('canvas');
+        c.width  = img.width  * scale;
+        c.height = img.height * scale;
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(url);
+        // HTMLImageElement 재생성 (워핑 엔진에서 사용)
+        const resizedImg = new Image();
+        resizedImg.src = c.toDataURL('image/jpeg', 0.85);
+        resizedImg.onload = () => resolve({ base64: resizedImg.src, img: resizedImg });
       };
       img.src = url;
     });
   }
 
-  let uploadedBase64 = null;
-
-  function triggerUpload() { document.getElementById('fileInput').click(); }
-
-  // ─────────────────────────────────────────
-  // [v1.1 수정] FileReader → resizeImage()
-  // ─────────────────────────────────────────
-  document.getElementById('fileInput').addEventListener('change', e => {
+  document.getElementById('fileInput').addEventListener('change', async e => {
     const file = e.target.files[0];
     if (!file) return;
-    resizeImage(file).then(base64 => {
-      uploadedBase64 = base64;
-      const zone = document.getElementById('uploadZone');
-      zone.classList.add('has-image');
-      zone.innerHTML = `<img src="${base64}" alt="업로드 사진"><div class="upload-replace" onclick="document.getElementById('fileInput').click()">탭해서 교체</div>`;
-    });
+    const { base64, img } = await resizeImage(file);
+    originalBase64 = base64;
+    originalImage  = img;
+    const zone = document.getElementById('uploadZone');
+    zone.classList.add('has-image');
+    zone.innerHTML = `<img src="${base64}" alt="업로드 사진"><div class="upload-replace" onclick="document.getElementById('fileInput').click()">탭해서 교체</div>`;
   });
 
   const uploadZone = document.getElementById('uploadZone');
@@ -420,26 +407,230 @@
     }
   });
 
+  // ─────────────────────────────────────────────────────────
+  // liquidWarp: Canvas 픽셀 단위 워핑
+  // cx,cy: 워핑 중심  radius: 영향 반경
+  // strength > 0 → 중심으로 당기기 (슬리밍)
+  // strength < 0 → 중심에서 밀기  (눈 확대)
+  // ─────────────────────────────────────────────────────────
+  function liquidWarp(srcCanvas, cx, cy, radius, strength) {
+    const w = srcCanvas.width, h = srcCanvas.height;
+    const src = srcCanvas.getContext('2d').getImageData(0, 0, w, h);
+    const dst = new ImageData(w, h);
+    const r2  = radius * radius;
+
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const dx = x - cx, dy = y - cy;
+        const dist2 = dx * dx + dy * dy;
+        let sx = x, sy = y;
+
+        if (dist2 < r2 && dist2 > 0) {
+          const dist   = Math.sqrt(dist2);
+          const factor = 1 - dist / radius;
+          const warp   = factor * factor * strength;
+          sx = x + dx * warp;
+          sy = y + dy * warp;
+        }
+
+        // bilinear interpolation
+        sx = Math.max(0, Math.min(w - 1.001, sx));
+        sy = Math.max(0, Math.min(h - 1.001, sy));
+        const x0 = Math.floor(sx), y0 = Math.floor(sy);
+        const x1 = Math.min(x0 + 1, w - 1), y1 = Math.min(y0 + 1, h - 1);
+        const fx = sx - x0, fy = sy - y0;
+
+        const idx = (y * w + x) * 4;
+        for (let c = 0; c < 4; c++) {
+          const tl = src.data[(y0 * w + x0) * 4 + c];
+          const tr = src.data[(y0 * w + x1) * 4 + c];
+          const bl = src.data[(y1 * w + x0) * 4 + c];
+          const br = src.data[(y1 * w + x1) * 4 + c];
+          dst.data[idx + c] = Math.round(
+            tl*(1-fx)*(1-fy) + tr*fx*(1-fy) +
+            bl*(1-fx)*fy     + br*fx*fy
+          );
+        }
+      }
+    }
+    const out = document.createElement('canvas');
+    out.width = w; out.height = h;
+    out.getContext('2d').putImageData(dst, 0, 0);
+    return out;
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // applyFaceWarp: 슬라이더 값 기반 워핑 순서 적용
+  // ─────────────────────────────────────────────────────────
+  function applyFaceWarp(imgEl) {
+    const jaw        = parseInt(document.getElementById('jawSlider').value);
+    const faceScale  = parseInt(document.getElementById('faceSlider').value);
+    const eyeEnlarge = parseInt(document.getElementById('eyeEnlargeSlider').value);
+    const nose       = parseInt(document.getElementById('noseSlider').value);
+
+    let canvas = document.createElement('canvas');
+    canvas.width  = imgEl.naturalWidth  || imgEl.width;
+    canvas.height = imgEl.naturalHeight || imgEl.height;
+    canvas.getContext('2d').drawImage(imgEl, 0, 0, canvas.width, canvas.height);
+
+    const W = canvas.width, H = canvas.height;
+    const cx = W * 0.5;
+    const cy = H * 0.42; // 눈 사이 기준 얼굴 중심
+
+    // 1) 턱선 슬리밍 — 하단 좌우를 중심으로 당기기
+    if (jaw > 0) {
+      const jawY = H * 0.72;
+      const jawR = W * 0.38;
+      const pwr  = (jaw / 60) * 0.55;
+      canvas = liquidWarp(canvas, cx - W*0.22, jawY, jawR, pwr); // 왼쪽 턱
+      canvas = liquidWarp(canvas, cx + W*0.22, jawY, jawR, pwr); // 오른쪽 턱
+    }
+
+    // 2) 얼굴 전체 축소 — 4방향에서 안쪽으로 당기기
+    if (faceScale > 0) {
+      const faceR = W * 0.48;
+      const pwr   = (faceScale / 40) * 0.45;
+      canvas = liquidWarp(canvas, cx,           cy - H*0.18, faceR, pwr*0.7); // 위
+      canvas = liquidWarp(canvas, cx,           cy + H*0.32, faceR, pwr*0.8); // 아래
+      canvas = liquidWarp(canvas, cx - W*0.32,  cy,          faceR, pwr);     // 왼
+      canvas = liquidWarp(canvas, cx + W*0.32,  cy,          faceR, pwr);     // 오른
+    }
+
+    // 3) 눈 확대 — 눈 위치에서 바깥으로 밀기 (strength 음수)
+    if (eyeEnlarge > 0) {
+      const eyeR = W * 0.12;
+      const pwr  = -(eyeEnlarge / 40) * 0.5;
+      canvas = liquidWarp(canvas, cx - W*0.17, cy - H*0.02, eyeR, pwr); // 왼눈
+      canvas = liquidWarp(canvas, cx + W*0.17, cy - H*0.02, eyeR, pwr); // 오른눈
+    }
+
+    // 4) 코 축소 — 코 중심으로 당기기
+    if (nose > 0) {
+      const noseR = W * 0.13;
+      const pwr   = (nose / 40) * 0.45;
+      canvas = liquidWarp(canvas, cx, cy + H*0.09, noseR, pwr);
+    }
+
+    return canvas;
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // applyColorFilter: 밝기·채도·피부 스무딩·선명도
+  // ─────────────────────────────────────────────────────────
+  function clamp(v) { return Math.max(0, Math.min(255, Math.round(v))); }
+
+  function applyColorFilter(srcCanvas) {
+    const skin   = parseInt(document.getElementById('skinSlider').value);
+    const bright = parseInt(document.getElementById('brightSlider').value);
+    const sharp  = parseInt(document.getElementById('sharpSlider').value);
+    const sat    = parseInt(document.getElementById('satSlider').value);
+
+    const w = srcCanvas.width, h = srcCanvas.height;
+    const ctx = srcCanvas.getContext('2d');
+    const imageData = ctx.getImageData(0, 0, w, h);
+    const data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+      let r = data[i], g = data[i+1], b = data[i+2];
+
+      // 밝기
+      if (bright !== 0) {
+        const d = bright * 1.5;
+        r = clamp(r + d); g = clamp(g + d); b = clamp(b + d);
+      }
+
+      // 채도
+      if (sat !== 0) {
+        const gray = 0.299*r + 0.587*g + 0.114*b;
+        const f    = 1 + sat / 100;
+        r = clamp(gray + (r - gray) * f);
+        g = clamp(gray + (g - gray) * f);
+        b = clamp(gray + (b - gray) * f);
+      }
+
+      // 피부 스무딩 (r>g>b 패턴의 피부 영역 감지)
+      if (skin > 0) {
+        const isSkin = r > 100 && g > 60 && b > 40 && r > g && g > b * 0.8;
+        if (isSkin) {
+          const sf  = skin / 100;
+          const avg = (r + g + b) / 3;
+          r = clamp(r + (avg - r) * sf * 0.4 + skin * 0.12);
+          g = clamp(g + (avg - g) * sf * 0.3 + skin * 0.10);
+          b = clamp(b + (avg - b) * sf * 0.2 + skin * 0.08);
+        }
+      }
+
+      data[i] = r; data[i+1] = g; data[i+2] = b;
+    }
+    ctx.putImageData(imageData, 0, 0);
+
+    // 선명도 — 언샤프 마스크
+    if (sharp > 0) {
+      const sf   = (sharp / 100) * 2;
+      const tmp  = document.createElement('canvas');
+      tmp.width = w; tmp.height = h;
+      const tctx = tmp.getContext('2d');
+      tctx.filter = 'blur(1px)';
+      tctx.drawImage(srcCanvas, 0, 0);
+      const blurred = tctx.getImageData(0, 0, w, h).data;
+      const orig    = ctx.getImageData(0, 0, w, h).data;
+      const result  = new ImageData(w, h);
+      for (let i = 0; i < orig.length; i += 4) {
+        result.data[i]   = clamp(orig[i]   + (orig[i]   - blurred[i])   * sf);
+        result.data[i+1] = clamp(orig[i+1] + (orig[i+1] - blurred[i+1]) * sf);
+        result.data[i+2] = clamp(orig[i+2] + (orig[i+2] - blurred[i+2]) * sf);
+        result.data[i+3] = 255;
+      }
+      ctx.putImageData(result, 0, 0);
+    }
+
+    return srcCanvas;
+  }
+
+  // ─────────────────────────────────────
+  // 메인 실행
+  // ─────────────────────────────────────
   async function runRetouch() {
-    if (!uploadedBase64) { showResult('error', '사진을 먼저 업로드해주세요.'); return; }
+    if (!originalBase64 || !originalImage) {
+      showResult('error', '사진을 먼저 업로드해주세요.'); return;
+    }
     const fidelity = parseFloat(document.getElementById('fidelitySlider').value);
     const btn = document.getElementById('runBtn');
     btn.disabled = true; btn.textContent = '처리 중...';
-    showResult('loading', '');
+    showResult('loading', 'Canvas 워핑 적용 중...');
 
     try {
+      // Step 1: Canvas 워핑 (얼굴형)
+      let warpedCanvas = applyFaceWarp(originalImage);
+
+      // Step 2: Canvas 색감·피부 필터
+      warpedCanvas = applyColorFilter(warpedCanvas);
+
+      // Step 3: base64 추출
+      const canvasBase64 = warpedCanvas.toDataURL('image/jpeg', 0.88);
+      updateLoadingMsg('AI 보정 요청 전송 중...');
+
+      // Step 4: Replicate API
       const res = await fetch(PROXY_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: uploadedBase64, codeformer_fidelity: fidelity, background_enhance: true, face_upsample: true })
+        body: JSON.stringify({
+          image: canvasBase64,
+          codeformer_fidelity: fidelity,
+          background_enhance: true,
+          face_upsample: true
+        })
       });
+
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.error || `요청 실패 (HTTP ${res.status})`);
       }
+
       const prediction = await res.json();
       const output = await pollPrediction(prediction.id);
-      showResult('success', output);
+      showResult('success', canvasBase64, output);
+
     } catch(e) {
       showResult('error', e.message);
     } finally {
@@ -447,20 +638,27 @@
     }
   }
 
+  function updateLoadingMsg(msg) {
+    const el = document.getElementById('loadingMsg');
+    if (el) el.textContent = msg;
+  }
+
   async function pollPrediction(id) {
     for (let i = 0; i < 60; i++) {
       await new Promise(r => setTimeout(r, 2000));
-      const res = await fetch(`${PROXY_URL}?path=status&id=${id}`);
+      const res  = await fetch(`${PROXY_URL}?path=status&id=${id}`);
       const data = await res.json();
-      const el = document.getElementById('loadingMsg');
-      if (el) el.textContent = `${data.status === 'processing' ? '보정 처리 중' : '대기 중'}... (${Math.round((i+1)*2)}초)`;
+      updateLoadingMsg(`${data.status === 'processing' ? 'AI 보정 처리 중' : '대기 중'}... (${Math.round((i+1)*2)}초)`);
       if (data.status === 'succeeded') return data.output;
-      if (data.status === 'failed') throw new Error(data.error || '보정 처리 실패');
+      if (data.status === 'failed')    throw new Error(data.error || '보정 처리 실패');
     }
     throw new Error('처리 시간 초과 (2분). 다시 시도해주세요.');
   }
 
-  function showResult(type, data) {
+  // ─────────────────────────────────────
+  // 결과 표시 — 3단 비교
+  // ─────────────────────────────────────
+  function showResult(type, canvasB64OrMsg, aiOutput) {
     const panel = document.getElementById('resultPanel');
     const body  = document.getElementById('resultBody');
     const badge = document.getElementById('resultBadge');
@@ -468,19 +666,23 @@
 
     if (type === 'loading') {
       badge.textContent = '처리 중'; badge.className = 'badge badge-info';
-      body.innerHTML = `<div class="loading-wrap"><div class="spinner"></div><p class="loading-msg" id="loadingMsg">보정 요청 전송 중...</p></div>`;
+      body.innerHTML = `<div class="loading-wrap"><div class="spinner"></div><p class="loading-msg" id="loadingMsg">${canvasB64OrMsg}</p></div>`;
+
     } else if (type === 'success') {
       badge.textContent = '완료'; badge.className = 'badge badge-ok';
-      const outUrl = Array.isArray(data) ? data[0] : data;
+      const outUrl = Array.isArray(aiOutput) ? aiOutput[0] : aiOutput;
       body.innerHTML = `
         <div class="compare-grid">
-          <div class="compare-pane"><img src="${uploadedBase64}" alt="원본"><p class="compare-label">원본</p></div>
-          <div class="compare-pane"><img src="${outUrl}" alt="보정 후" crossorigin="anonymous"><p class="compare-label">보정 후</p></div>
+          <div class="compare-pane"><img src="${originalBase64}" alt="원본"><p class="compare-label">① 원본</p></div>
+          <div class="compare-pane"><img src="${canvasB64OrMsg}" alt="Canvas 보정"><p class="compare-label">② Canvas 보정</p></div>
+          <div class="compare-pane"><img src="${outUrl}" alt="AI 최종" crossorigin="anonymous"><p class="compare-label">③ AI 최종</p></div>
         </div>
-        <a class="download-link" href="${outUrl}" target="_blank" download="retouch_result.png">결과 이미지 저장</a>`;
+        <a class="download-link" href="${outUrl}" target="_blank" download="retouch_final.jpg">③ AI 최종 저장</a>
+        <a class="download-link" href="${canvasB64OrMsg}" download="retouch_canvas.jpg">② Canvas 보정만 저장</a>`;
+
     } else if (type === 'error') {
       badge.textContent = '오류'; badge.className = 'badge badge-err';
-      body.innerHTML = `<p class="err-msg">${data}</p>`;
+      body.innerHTML = `<p class="err-msg">${canvasB64OrMsg}</p>`;
     }
   }
 </script>
