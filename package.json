@@ -1,0 +1,13 @@
+{
+  "name": "face-retouch",
+  "version": "1.0.0",
+  "description": "CodeFormer 얼굴 보정 웹앱 - 작성자: YeonJu",
+  "private": true,
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "devDependencies": {
+    "vercel": "latest"
+  }
+}

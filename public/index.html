@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Face Retouch · CodeFormer</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f7f6f3;
+      --surface: #ffffff;
+      --border: #e2e0d8;
+      --border-strong: #c8c6be;
+      --text-primary: #1a1917;
+      --text-secondary: #6b6a66;
+      --text-hint: #9e9c98;
+      --accent: #1a1917;
+      --accent-fg: #ffffff;
+      --success: #3B6D11;
+      --error: #A32D2D;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1a1917;
+        --surface: #242320;
+        --border: #333230;
+        --border-strong: #4a4845;
+        --text-primary: #f0ede8;
+        --text-secondary: #9e9c98;
+        --text-hint: #6b6a66;
+        --accent: #f0ede8;
+        --accent-fg: #1a1917;
+      }
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 0;
+    }
+
+    .header {
+      padding: 20px 24px 16px;
+      border-bottom: 0.5px solid var(--border);
+      background: var(--surface);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .header-inner {
+      max-width: 640px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo { font-size: 16px; font-weight: 600; letter-spacing: -0.02em; }
+    .logo span { color: var(--text-secondary); font-weight: 400; }
+
+    .main {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 24px 16px 48px;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-hint);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 8px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    /* 업로드 존 */
+    .upload-zone {
+      border: 1.5px dashed var(--border-strong);
+      border-radius: var(--radius-lg);
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-bottom: 16px;
+      background: var(--surface);
+    }
+    .upload-zone:hover { background: var(--bg); }
+    .upload-zone.has-image { padding: 0; border-style: solid; overflow: hidden; }
+    .upload-zone img { width: 100%; max-height: 320px; object-fit: cover; display: block; border-radius: calc(var(--radius-lg) - 1px); }
+    .upload-replace { padding: 8px; font-size: 11px; color: var(--text-hint); text-align: center; cursor: pointer; }
+    .upload-icon { font-size: 28px; margin-bottom: 10px; }
+    .upload-title { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
+    .upload-sub { font-size: 13px; color: var(--text-secondary); }
+
+    /* 슬라이더 그리드 */
+    .controls-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 400px) {
+      .controls-grid { grid-template-columns: 1fr; }
+    }
+
+    .control-card {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+    }
+
+    .control-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .control-name { font-size: 13px; font-weight: 500; }
+    .control-val { font-size: 13px; color: var(--text-secondary); min-width: 28px; text-align: right; }
+
+    input[type=range] {
+      width: 100%;
+      -webkit-appearance: none;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      outline: none;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: var(--text-primary);
+      cursor: pointer;
+    }
+
+    /* 프리셋 */
+    .preset-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    .preset-btn {
+      font-size: 12px; padding: 6px 14px;
+      border: 0.5px solid var(--border-strong);
+      border-radius: 20px;
+      background: transparent;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: all 0.15s;
+    }
+    .preset-btn:hover, .preset-btn.active {
+      background: var(--text-primary);
+      color: var(--accent-fg);
+      border-color: var(--text-primary);
+    }
+
+    /* fidelity */
+    .fidelity-desc {
+      font-size: 11px;
+      color: var(--text-hint);
+      display: flex;
+      justify-content: space-between;
+      margin-top: 4px;
+    }
+
+    /* 실행 버튼 */
+    .run-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--accent);
+      color: var(--accent-fg);
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      margin-bottom: 16px;
+    }
+    .run-btn:hover { opacity: 0.85; }
+    .run-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* 상태 표시 */
+    .status-bar {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; color: var(--text-secondary);
+      padding: 8px 12px;
+      background: var(--bg);
+      border-radius: var(--radius-md);
+      margin-bottom: 16px;
+    }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--border-strong); flex-shrink: 0; }
+    .dot.ok { background: var(--success); }
+    .dot.err { background: var(--error); }
+
+    /* 결과 */
+    .result-panel { display: none; }
+    .result-panel.visible { display: block; }
+    .result-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 12px;
+    }
+    .badge {
+      font-size: 11px; padding: 3px 10px;
+      border-radius: 20px; font-weight: 500;
+    }
+    .badge-info { background: #E6F1FB; color: #185FA5; }
+    .badge-ok   { background: #EAF3DE; color: #3B6D11; }
+    .badge-err  { background: #FCEBEB; color: #A32D2D; }
+
+    .compare-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 1px; background: var(--border);
+      border-radius: var(--radius-md); overflow: hidden;
+      margin-bottom: 12px;
+    }
+    .compare-pane { background: var(--surface); padding: 8px; text-align: center; }
+    .compare-pane img { width: 100%; border-radius: 4px; max-height: 220px; object-fit: cover; }
+    .compare-label { font-size: 11px; color: var(--text-hint); margin-top: 4px; }
+
+    .spinner {
+      width: 24px; height: 24px;
+      border: 2px solid var(--border);
+      border-top-color: var(--text-secondary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 10px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-wrap { text-align: center; padding: 2rem; }
+    .loading-msg { font-size: 13px; color: var(--text-secondary); }
+
+    .download-link {
+      display: block; text-align: center;
+      padding: 10px;
+      border: 0.5px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      font-size: 13px; color: var(--text-secondary);
+      text-decoration: none;
+    }
+    .download-link:hover { background: var(--bg); }
+
+    .err-msg { font-size: 13px; color: var(--error); line-height: 1.7; white-space: pre-line; }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <p class="logo">Face Retouch <span>· CodeFormer</span></p>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- 사진 업로드 -->
+  <p class="section-label">사진 업로드</p>
+  <div class="upload-zone" id="uploadZone" onclick="triggerUpload()">
+    <div class="upload-icon">📷</div>
+    <p class="upload-title">사진을 탭하거나 드래그해서 업로드</p>
+    <p class="upload-sub">JPG, PNG, WEBP · 최대 10MB</p>
+  </div>
+  <input type="file" id="fileInput" accept="image/*" style="display:none">
+
+  <!-- 보정 강도 -->
+  <p class="section-label">보정 강도</p>
+  <div class="controls-grid">
+    <div class="control-card">
+      <div class="control-header"><span class="control-name">피부 보정</span><span class="control-val" id="skinVal">50</span></div>
+      <input type="range" min="0" max="100" value="50" step="1" oninput="document.getElementById('skinVal').textContent=this.value">
+    </div>
+    <div class="control-card">
+      <div class="control-header"><span class="control-name">밝기·선명도</span><span class="control-val" id="brightVal">40</span></div>
+      <input type="range" min="0" max="100" value="40" step="1" oninput="document.getElementById('brightVal').textContent=this.value">
+    </div>
+    <div class="control-card">
+      <div class="control-header"><span class="control-name">얼굴형 슬리밍</span><span class="control-val" id="slimVal">30</span></div>
+      <input type="range" min="0" max="100" value="30" step="1" oninput="document.getElementById('slimVal').textContent=this.value">
+    </div>
+    <div class="control-card">
+      <div class="control-header"><span class="control-name">눈 보정</span><span class="control-val" id="eyeVal">20</span></div>
+      <input type="range" min="0" max="100" value="20" step="1" oninput="document.getElementById('eyeVal').textContent=this.value">
+    </div>
+  </div>
+
+  <!-- 프리셋 -->
+  <p class="section-label">프리셋</p>
+  <div class="preset-row">
+    <button class="preset-btn" onclick="applyPreset('natural',this)">자연스러운</button>
+    <button class="preset-btn" onclick="applyPreset('portrait',this)">인물 사진</button>
+    <button class="preset-btn" onclick="applyPreset('soft',this)">소프트</button>
+    <button class="preset-btn" onclick="applyPreset('strong',this)">강한 보정</button>
+  </div>
+
+  <!-- CodeFormer fidelity -->
+  <p class="section-label">CodeFormer 충실도</p>
+  <div class="card">
+    <div class="control-header">
+      <span class="control-name">fidelity</span>
+      <span class="control-val" id="fidelityVal">0.7</span>
+    </div>
+    <input type="range" min="0" max="1" value="0.7" step="0.1" oninput="document.getElementById('fidelityVal').textContent=parseFloat(this.value).toFixed(1)" id="fidelitySlider">
+    <div class="fidelity-desc"><span>강한 보정 (0.0)</span><span>원본 유지 (1.0)</span></div>
+  </div>
+
+  <!-- 실행 -->
+  <button class="run-btn" id="runBtn" onclick="runRetouch()">보정 실행</button>
+
+  <!-- 결과 -->
+  <div class="result-panel" id="resultPanel">
+    <div class="result-header">
+      <p class="section-label" style="margin:0">결과</p>
+      <span class="badge badge-info" id="resultBadge">처리 중</span>
+    </div>
+    <div id="resultBody"></div>
+  </div>
+
+</main>
+
+<script>
+  // ⚠️ Vercel 배포 후 아래 URL을 본인 도메인으로 변경하세요
+  // 예: https://face-retouch-yourname.vercel.app/api/retouch
+  const PROXY_URL = '/api/retouch';
+
+  const presets = {
+    natural: { skin:40, bright:30, slim:20, eye:15, fidelity:0.8 },
+    portrait:{ skin:60, bright:50, slim:35, eye:40, fidelity:0.7 },
+    soft:    { skin:70, bright:20, slim:10, eye:10, fidelity:0.6 },
+    strong:  { skin:80, bright:70, slim:60, eye:65, fidelity:0.3 }
+  };
+
+  function applyPreset(name, btn) {
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const p = presets[name];
+    setV('skinVal', p.skin);
+    setV('brightVal', p.bright);
+    setV('slimVal', p.slim);
+    setV('eyeVal', p.eye);
+    document.getElementById('fidelitySlider').value = p.fidelity;
+    document.getElementById('fidelityVal').textContent = p.fidelity.toFixed(1);
+  }
+
+  function setV(id, val) { document.getElementById(id).textContent = val; }
+
+  let uploadedBase64 = null;
+
+  function triggerUpload() { document.getElementById('fileInput').click(); }
+
+  document.getElementById('fileInput').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      uploadedBase64 = ev.target.result;
+      const zone = document.getElementById('uploadZone');
+      zone.classList.add('has-image');
+      zone.innerHTML = `<img src="${ev.target.result}" alt="업로드 사진"><div class="upload-replace" onclick="document.getElementById('fileInput').click()">탭해서 교체</div>`;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  const uploadZone = document.getElementById('uploadZone');
+  uploadZone.addEventListener('dragover', e => e.preventDefault());
+  uploadZone.addEventListener('drop', e => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) {
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      document.getElementById('fileInput').files = dt.files;
+      document.getElementById('fileInput').dispatchEvent(new Event('change'));
+    }
+  });
+
+  async function runRetouch() {
+    if (!uploadedBase64) { showResult('error', '사진을 먼저 업로드해주세요.'); return; }
+    const fidelity = parseFloat(document.getElementById('fidelitySlider').value);
+    const btn = document.getElementById('runBtn');
+    btn.disabled = true; btn.textContent = '처리 중...';
+    showResult('loading', '');
+
+    try {
+      const res = await fetch(PROXY_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: uploadedBase64, codeformer_fidelity: fidelity, background_enhance: true, face_upsample: true })
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `요청 실패 (HTTP ${res.status})`);
+      }
+      const prediction = await res.json();
+      const output = await pollPrediction(prediction.id);
+      showResult('success', output);
+    } catch(e) {
+      showResult('error', e.message);
+    } finally {
+      btn.disabled = false; btn.textContent = '보정 실행';
+    }
+  }
+
+  async function pollPrediction(id) {
+    for (let i = 0; i < 60; i++) {
+      await new Promise(r => setTimeout(r, 2000));
+      const res = await fetch(`${PROXY_URL}?path=status&id=${id}`);
+      const data = await res.json();
+      const el = document.getElementById('loadingMsg');
+      if (el) el.textContent = `${data.status === 'processing' ? '보정 처리 중' : '대기 중'}... (${Math.round((i+1)*2)}초)`;
+      if (data.status === 'succeeded') return data.output;
+      if (data.status === 'failed') throw new Error(data.error || '보정 처리 실패');
+    }
+    throw new Error('처리 시간 초과 (2분). 다시 시도해주세요.');
+  }
+
+  function showResult(type, data) {
+    const panel = document.getElementById('resultPanel');
+    const body  = document.getElementById('resultBody');
+    const badge = document.getElementById('resultBadge');
+    panel.classList.add('visible');
+
+    if (type === 'loading') {
+      badge.textContent = '처리 중'; badge.className = 'badge badge-info';
+      body.innerHTML = `<div class="loading-wrap"><div class="spinner"></div><p class="loading-msg" id="loadingMsg">보정 요청 전송 중...</p></div>`;
+    } else if (type === 'success') {
+      badge.textContent = '완료'; badge.className = 'badge badge-ok';
+      const outUrl = Array.isArray(data) ? data[0] : data;
+      body.innerHTML = `
+        <div class="compare-grid">
+          <div class="compare-pane"><img src="${uploadedBase64}" alt="원본"><p class="compare-label">원본</p></div>
+          <div class="compare-pane"><img src="${outUrl}" alt="보정 후" crossorigin="anonymous"><p class="compare-label">보정 후</p></div>
+        </div>
+        <a class="download-link" href="${outUrl}" target="_blank" download="retouch_result.png">결과 이미지 저장</a>`;
+    } else if (type === 'error') {
+      badge.textContent = '오류'; badge.className = 'badge badge-err';
+      body.innerHTML = `<p class="err-msg">${data}</p>`;
+    }
+  }
+</script>
+</body>
+</html>
