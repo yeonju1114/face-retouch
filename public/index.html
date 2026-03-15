@@ -19,6 +19,8 @@
       --accent-fg: #ffffff;
       --success: #3B6D11;
       --error: #A32D2D;
+      --warning: #7A4F0D;
+      --warning-bg: #FEF3E2;
       --radius-md: 8px;
       --radius-lg: 12px;
     }
@@ -34,37 +36,28 @@
         --text-hint: #6b6a66;
         --accent: #f0ede8;
         --accent-fg: #1a1917;
+        --warning-bg: #2e2410;
       }
     }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: var(--text-primary);
-      min-height: 100vh;
+      background: var(--bg); color: var(--text-primary); min-height: 100vh;
     }
 
     .header {
-      padding: 20px 24px 16px;
-      border-bottom: 0.5px solid var(--border);
-      background: var(--surface);
-      position: sticky;
-      top: 0;
-      z-index: 10;
+      padding: 20px 24px 16px; border-bottom: 0.5px solid var(--border);
+      background: var(--surface); position: sticky; top: 0; z-index: 10;
     }
     .header-inner {
-      max-width: 640px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      max-width: 640px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
     }
     .logo { font-size: 16px; font-weight: 600; letter-spacing: -0.02em; }
     .logo span { color: var(--text-secondary); font-weight: 400; }
     .version-badge {
-      font-size: 10px; padding: 2px 8px;
-      border-radius: 20px; background: var(--border);
-      color: var(--text-hint); font-weight: 500;
+      font-size: 10px; padding: 2px 8px; border-radius: 20px;
+      background: var(--border); color: var(--text-hint); font-weight: 500;
     }
 
     .main { max-width: 640px; margin: 0 auto; padding: 24px 16px 48px; }
@@ -74,8 +67,7 @@
       text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px;
     }
     .section-row {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 8px;
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;
     }
     .section-row .section-label { margin-bottom: 0; }
     .tag { font-size: 10px; padding: 2px 7px; border-radius: 10px; font-weight: 500; }
@@ -86,6 +78,20 @@
       background: var(--surface); border: 0.5px solid var(--border);
       border-radius: var(--radius-lg); padding: 16px; margin-bottom: 16px;
     }
+
+    /* 어두운 사진 경고 */
+    .dark-warning {
+      display: none;
+      background: var(--warning-bg);
+      border: 0.5px solid #E8A44A;
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      font-size: 12px;
+      color: var(--warning);
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+    .dark-warning.visible { display: block; }
 
     /* 업로드 존 */
     .upload-zone {
@@ -194,7 +200,7 @@
 <header class="header">
   <div class="header-inner">
     <p class="logo">Face Retouch <span>· CodeFormer</span></p>
-    <span class="version-badge">v1.2</span>
+    <span class="version-badge">v1.3</span>
   </div>
 </header>
 
@@ -208,6 +214,12 @@
     <p class="upload-sub">JPG, PNG, WEBP · 최대 10MB</p>
   </div>
   <input type="file" id="fileInput" accept="image/*" style="display:none">
+
+  <!-- 어두운 사진 경고 -->
+  <div class="dark-warning" id="darkWarning">
+    ⚠️ 어두운 사진이 감지됐어요. 밝기·채도 보정 시 배경이 날아갈 수 있어요.<br>
+    <strong>밝기·채도를 0에 가깝게</strong> 유지하고 AI fidelity는 0.85 이상 권장해요.
+  </div>
 
   <!-- 얼굴형 보정 (Canvas 워핑) -->
   <div class="section-row">
@@ -307,45 +319,43 @@
 <script>
   /**
    * Description: Face Retouch 프론트엔드
-   * 작성자: YeonJu / Version : 1.2
+   * 작성자: YeonJu / Version : 1.3
    *
-   * v1.2 변경사항:
-   *   - Canvas liquidWarp 엔진 추가
-   *     → 턱선 슬리밍, 얼굴 축소, 눈 확대, 코 축소
-   *   - Canvas 픽셀 필터 추가
-   *     → 피부 스무딩, 밝기, 선명도(언샤프마스크), 채도
-   *   - 보정 파이프라인: 원본 → Canvas 워핑/필터 → Replicate AI
-   *   - 결과 3단 비교: ①원본 / ②Canvas 보정 / ③AI 최종
-   *   - 프리셋 초기화 버튼 추가
-   *   - resizeImage() 유지 (HTTP 413 방지)
+   * v1.3 변경사항:
+   *   [A] 밝기·채도 기본값 0으로 변경 (과보정 방지)
+   *   [A] 어두운 사진 자동 감지 → 경고 배너 표시
+   *   [A] 어두운 사진 감지 시 색감 보정 자동 억제 (밝기·채도 ×0.3)
+   *   [C] liquidWarp에 페더링(feathering) 마스크 적용
+   *       → 워핑 경계선 자연스럽게 블렌딩
+   *   [C] 워핑 강도 곡선 개선 (선형 → smoothstep)
    */
 
   const PROXY_URL = '/api/retouch';
 
   // ─────────────────────────────────────
-  // 프리셋
+  // 프리셋 (밝기·채도 기본값 0 기준으로 재조정)
   // ─────────────────────────────────────
   const presets = {
-    natural: { jaw:15, face:8,  eye:10, nose:5,  skin:30, bright:15, sharp:20, sat:10,  fidelity:0.8 },
-    portrait:{ jaw:25, face:15, eye:20, nose:10, skin:50, bright:25, sharp:40, sat:20,  fidelity:0.7 },
-    soft:    { jaw:10, face:5,  eye:8,  nose:5,  skin:70, bright:10, sharp:10, sat:-10, fidelity:0.6 },
-    strong:  { jaw:50, face:35, eye:35, nose:30, skin:80, bright:40, sharp:60, sat:40,  fidelity:0.3 },
-    reset:   { jaw:0,  face:0,  eye:0,  nose:0,  skin:0,  bright:0,  sharp:0,  sat:0,   fidelity:0.7 }
+    natural: { jaw:12, face:6,  eye:8,  nose:4,  skin:25, bright:8,  sharp:15, sat:5,   fidelity:0.85 },
+    portrait:{ jaw:20, face:12, eye:15, nose:8,  skin:45, bright:20, sharp:30, sat:15,  fidelity:0.7  },
+    soft:    { jaw:8,  face:4,  eye:6,  nose:3,  skin:60, bright:5,  sharp:8,  sat:-5,  fidelity:0.6  },
+    strong:  { jaw:45, face:30, eye:28, nose:22, skin:75, bright:30, sharp:50, sat:30,  fidelity:0.3  },
+    reset:   { jaw:0,  face:0,  eye:0,  nose:0,  skin:0,  bright:0,  sharp:0,  sat:0,   fidelity:0.7  }
   };
 
   function applyPreset(name, btn) {
     document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
     if (name !== 'reset') btn.classList.add('active');
     const p = presets[name];
-    setSlider('jawSlider',        'jawVal',         p.jaw);
-    setSlider('faceSlider',       'faceVal',        p.face);
-    setSlider('eyeEnlargeSlider', 'eyeEnlargeVal',  p.eye);
-    setSlider('noseSlider',       'noseVal',        p.nose);
-    setSlider('skinSlider',       'skinVal',        p.skin);
-    setSlider('brightSlider',     'brightVal',      p.bright);
-    setSlider('sharpSlider',      'sharpVal',       p.sharp);
-    setSlider('satSlider',        'satVal',         p.sat);
-    setSlider('fidelitySlider',   'fidelityVal',    p.fidelity, true);
+    setSlider('jawSlider',        'jawVal',        p.jaw);
+    setSlider('faceSlider',       'faceVal',       p.face);
+    setSlider('eyeEnlargeSlider', 'eyeEnlargeVal', p.eye);
+    setSlider('noseSlider',       'noseVal',       p.nose);
+    setSlider('skinSlider',       'skinVal',       p.skin);
+    setSlider('brightSlider',     'brightVal',     p.bright);
+    setSlider('sharpSlider',      'sharpVal',      p.sharp);
+    setSlider('satSlider',        'satVal',        p.sat);
+    setSlider('fidelitySlider',   'fidelityVal',   p.fidelity, true);
   }
 
   function setSlider(sliderId, valId, val, isFloat = false) {
@@ -355,11 +365,31 @@
     if (valEl)  valEl.textContent = isFloat ? parseFloat(val).toFixed(1) : val;
   }
 
+  // ─────────────────────────────────────────────────────
+  // [A] 어두운 사진 감지
+  // 이미지 평균 밝기(0~255)를 계산해서 임계값 이하면 dark 판정
+  // ─────────────────────────────────────────────────────
+  function detectDarkImage(imgEl, threshold = 80) {
+    const c = document.createElement('canvas');
+    // 빠른 감지용 — 축소 샘플링
+    c.width = 64; c.height = 64;
+    const ctx = c.getContext('2d');
+    ctx.drawImage(imgEl, 0, 0, 64, 64);
+    const data = ctx.getImageData(0, 0, 64, 64).data;
+    let sum = 0;
+    for (let i = 0; i < data.length; i += 4) {
+      sum += 0.299*data[i] + 0.587*data[i+1] + 0.114*data[i+2];
+    }
+    const avg = sum / (64 * 64);
+    return { isDark: avg < threshold, avgBrightness: avg };
+  }
+
   // ─────────────────────────────────────
   // 이미지 로드 + 리사이즈 (HTTP 413 방지)
   // ─────────────────────────────────────
   let originalImage  = null;
   let originalBase64 = null;
+  let isDarkPhoto    = false;
 
   function triggerUpload() { document.getElementById('fileInput').click(); }
 
@@ -370,11 +400,9 @@
       img.onload = () => {
         const scale = Math.min(1, maxWidth / img.width);
         const c = document.createElement('canvas');
-        c.width  = img.width  * scale;
-        c.height = img.height * scale;
+        c.width = img.width * scale; c.height = img.height * scale;
         c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
         URL.revokeObjectURL(url);
-        // HTMLImageElement 재생성 (워핑 엔진에서 사용)
         const resizedImg = new Image();
         resizedImg.src = c.toDataURL('image/jpeg', 0.85);
         resizedImg.onload = () => resolve({ base64: resizedImg.src, img: resizedImg });
@@ -389,6 +417,13 @@
     const { base64, img } = await resizeImage(file);
     originalBase64 = base64;
     originalImage  = img;
+
+    // 어두운 사진 감지
+    const { isDark } = detectDarkImage(img);
+    isDarkPhoto = isDark;
+    const warning = document.getElementById('darkWarning');
+    isDark ? warning.classList.add('visible') : warning.classList.remove('visible');
+
     const zone = document.getElementById('uploadZone');
     zone.classList.add('has-image');
     zone.innerHTML = `<img src="${base64}" alt="업로드 사진"><div class="upload-replace" onclick="document.getElementById('fileInput').click()">탭해서 교체</div>`;
@@ -407,17 +442,27 @@
     }
   });
 
-  // ─────────────────────────────────────────────────────────
-  // liquidWarp: Canvas 픽셀 단위 워핑
-  // cx,cy: 워핑 중심  radius: 영향 반경
-  // strength > 0 → 중심으로 당기기 (슬리밍)
-  // strength < 0 → 중심에서 밀기  (눈 확대)
-  // ─────────────────────────────────────────────────────────
-  function liquidWarp(srcCanvas, cx, cy, radius, strength) {
+  // ─────────────────────────────────────────────────────
+  // [C] smoothstep: 워핑 강도 곡선을 부드럽게 (선형 → S커브)
+  // ─────────────────────────────────────────────────────
+  function smoothstep(t) {
+    // t: 0~1 → 경계에서 0, 중심에서 최대 → S커브
+    return t * t * (3 - 2 * t);
+  }
+
+  // ─────────────────────────────────────────────────────
+  // [C] liquidWarp v2: 페더링 마스크 + smoothstep 적용
+  //
+  // 개선 전: 워핑 강도가 radius 경계에서 급격히 끊김
+  // 개선 후: featherRatio(기본 0.3) 구간에서 서서히 감쇠
+  //          → 워핑 영역 경계선이 자연스럽게 블렌딩
+  // ─────────────────────────────────────────────────────
+  function liquidWarp(srcCanvas, cx, cy, radius, strength, featherRatio = 0.35) {
     const w = srcCanvas.width, h = srcCanvas.height;
     const src = srcCanvas.getContext('2d').getImageData(0, 0, w, h);
     const dst = new ImageData(w, h);
     const r2  = radius * radius;
+    const featherStart = radius * (1 - featherRatio); // 페더링 시작 거리
 
     for (let y = 0; y < h; y++) {
       for (let x = 0; x < w; x++) {
@@ -426,11 +471,20 @@
         let sx = x, sy = y;
 
         if (dist2 < r2 && dist2 > 0) {
-          const dist   = Math.sqrt(dist2);
-          const factor = 1 - dist / radius;
-          const warp   = factor * factor * strength;
-          sx = x + dx * warp;
-          sy = y + dy * warp;
+          const dist = Math.sqrt(dist2);
+
+          // smoothstep 기반 워핑 강도
+          const t = 1 - dist / radius;
+          let warpFactor = smoothstep(t) * strength;
+
+          // 페더링: featherStart 바깥에서 서서히 강도 감쇠
+          if (dist > featherStart) {
+            const featherT = 1 - (dist - featherStart) / (radius - featherStart);
+            warpFactor *= smoothstep(featherT);
+          }
+
+          sx = x + dx * warpFactor;
+          sy = y + dy * warpFactor;
         }
 
         // bilinear interpolation
@@ -459,9 +513,9 @@
     return out;
   }
 
-  // ─────────────────────────────────────────────────────────
-  // applyFaceWarp: 슬라이더 값 기반 워핑 순서 적용
-  // ─────────────────────────────────────────────────────────
+  // ─────────────────────────────────────
+  // applyFaceWarp: 슬라이더 값 기반 워핑
+  // ─────────────────────────────────────
   function applyFaceWarp(imgEl) {
     const jaw        = parseInt(document.getElementById('jawSlider').value);
     const faceScale  = parseInt(document.getElementById('faceSlider').value);
@@ -475,55 +529,59 @@
 
     const W = canvas.width, H = canvas.height;
     const cx = W * 0.5;
-    const cy = H * 0.42; // 눈 사이 기준 얼굴 중심
+    const cy = H * 0.42;
 
-    // 1) 턱선 슬리밍 — 하단 좌우를 중심으로 당기기
+    // 1) 턱선 슬리밍
     if (jaw > 0) {
       const jawY = H * 0.72;
       const jawR = W * 0.38;
-      const pwr  = (jaw / 60) * 0.55;
-      canvas = liquidWarp(canvas, cx - W*0.22, jawY, jawR, pwr); // 왼쪽 턱
-      canvas = liquidWarp(canvas, cx + W*0.22, jawY, jawR, pwr); // 오른쪽 턱
+      const pwr  = (jaw / 60) * 0.45; // 강도 살짝 낮춤
+      canvas = liquidWarp(canvas, cx - W*0.22, jawY, jawR, pwr, 0.4);
+      canvas = liquidWarp(canvas, cx + W*0.22, jawY, jawR, pwr, 0.4);
     }
 
-    // 2) 얼굴 전체 축소 — 4방향에서 안쪽으로 당기기
+    // 2) 얼굴 전체 축소
     if (faceScale > 0) {
       const faceR = W * 0.48;
-      const pwr   = (faceScale / 40) * 0.45;
-      canvas = liquidWarp(canvas, cx,           cy - H*0.18, faceR, pwr*0.7); // 위
-      canvas = liquidWarp(canvas, cx,           cy + H*0.32, faceR, pwr*0.8); // 아래
-      canvas = liquidWarp(canvas, cx - W*0.32,  cy,          faceR, pwr);     // 왼
-      canvas = liquidWarp(canvas, cx + W*0.32,  cy,          faceR, pwr);     // 오른
+      const pwr   = (faceScale / 40) * 0.38;
+      canvas = liquidWarp(canvas, cx,           cy - H*0.18, faceR, pwr*0.7, 0.4);
+      canvas = liquidWarp(canvas, cx,           cy + H*0.32, faceR, pwr*0.8, 0.4);
+      canvas = liquidWarp(canvas, cx - W*0.32,  cy,          faceR, pwr,     0.4);
+      canvas = liquidWarp(canvas, cx + W*0.32,  cy,          faceR, pwr,     0.4);
     }
 
-    // 3) 눈 확대 — 눈 위치에서 바깥으로 밀기 (strength 음수)
+    // 3) 눈 확대
     if (eyeEnlarge > 0) {
-      const eyeR = W * 0.12;
-      const pwr  = -(eyeEnlarge / 40) * 0.5;
-      canvas = liquidWarp(canvas, cx - W*0.17, cy - H*0.02, eyeR, pwr); // 왼눈
-      canvas = liquidWarp(canvas, cx + W*0.17, cy - H*0.02, eyeR, pwr); // 오른눈
+      const eyeR = W * 0.11;
+      const pwr  = -(eyeEnlarge / 40) * 0.42;
+      canvas = liquidWarp(canvas, cx - W*0.17, cy - H*0.02, eyeR, pwr, 0.45);
+      canvas = liquidWarp(canvas, cx + W*0.17, cy - H*0.02, eyeR, pwr, 0.45);
     }
 
-    // 4) 코 축소 — 코 중심으로 당기기
+    // 4) 코 축소
     if (nose > 0) {
-      const noseR = W * 0.13;
-      const pwr   = (nose / 40) * 0.45;
-      canvas = liquidWarp(canvas, cx, cy + H*0.09, noseR, pwr);
+      const noseR = W * 0.12;
+      const pwr   = (nose / 40) * 0.38;
+      canvas = liquidWarp(canvas, cx, cy + H*0.09, noseR, pwr, 0.4);
     }
 
     return canvas;
   }
 
-  // ─────────────────────────────────────────────────────────
-  // applyColorFilter: 밝기·채도·피부 스무딩·선명도
-  // ─────────────────────────────────────────────────────────
+  // ─────────────────────────────────────────────────────
+  // applyColorFilter: 밝기·채도·피부·선명도
+  // [A] 어두운 사진 감지 시 밝기·채도 자동 억제 (×0.3)
+  // ─────────────────────────────────────────────────────
   function clamp(v) { return Math.max(0, Math.min(255, Math.round(v))); }
 
   function applyColorFilter(srcCanvas) {
     const skin   = parseInt(document.getElementById('skinSlider').value);
-    const bright = parseInt(document.getElementById('brightSlider').value);
     const sharp  = parseInt(document.getElementById('sharpSlider').value);
-    const sat    = parseInt(document.getElementById('satSlider').value);
+
+    // 어두운 사진이면 밝기·채도 억제
+    const darkMult = isDarkPhoto ? 0.3 : 1.0;
+    const bright   = parseInt(document.getElementById('brightSlider').value) * darkMult;
+    const sat      = parseInt(document.getElementById('satSlider').value)    * darkMult;
 
     const w = srcCanvas.width, h = srcCanvas.height;
     const ctx = srcCanvas.getContext('2d');
@@ -548,15 +606,15 @@
         b = clamp(gray + (b - gray) * f);
       }
 
-      // 피부 스무딩 (r>g>b 패턴의 피부 영역 감지)
+      // 피부 스무딩
       if (skin > 0) {
-        const isSkin = r > 100 && g > 60 && b > 40 && r > g && g > b * 0.8;
+        const isSkin = r > 95 && g > 55 && b > 35 && r > g && g > b * 0.78;
         if (isSkin) {
           const sf  = skin / 100;
           const avg = (r + g + b) / 3;
-          r = clamp(r + (avg - r) * sf * 0.4 + skin * 0.12);
-          g = clamp(g + (avg - g) * sf * 0.3 + skin * 0.10);
-          b = clamp(b + (avg - b) * sf * 0.2 + skin * 0.08);
+          r = clamp(r + (avg - r) * sf * 0.4 + skin * 0.10);
+          g = clamp(g + (avg - g) * sf * 0.3 + skin * 0.08);
+          b = clamp(b + (avg - b) * sf * 0.2 + skin * 0.06);
         }
       }
 
@@ -566,8 +624,8 @@
 
     // 선명도 — 언샤프 마스크
     if (sharp > 0) {
-      const sf   = (sharp / 100) * 2;
-      const tmp  = document.createElement('canvas');
+      const sf  = (sharp / 100) * 1.8;
+      const tmp = document.createElement('canvas');
       tmp.width = w; tmp.height = h;
       const tctx = tmp.getContext('2d');
       tctx.filter = 'blur(1px)';
@@ -600,13 +658,11 @@
     showResult('loading', 'Canvas 워핑 적용 중...');
 
     try {
-      // Step 1: Canvas 워핑 (얼굴형)
+      // Step 1: Canvas 워핑
       let warpedCanvas = applyFaceWarp(originalImage);
-
-      // Step 2: Canvas 색감·피부 필터
+      // Step 2: Canvas 색감 필터
       warpedCanvas = applyColorFilter(warpedCanvas);
-
-      // Step 3: base64 추출
+      // Step 3: base64
       const canvasBase64 = warpedCanvas.toDataURL('image/jpeg', 0.88);
       updateLoadingMsg('AI 보정 요청 전송 중...');
 
